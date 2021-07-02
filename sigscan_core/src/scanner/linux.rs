@@ -1,7 +1,7 @@
 use std::ffi::{c_void, CStr, CString};
 use std::os::raw::{c_char, c_int};
 
-use libc::{dl_iterate_phdr, dl_phdr_info, Elf32_Phdr, PT_LOAD};
+use libc::{dl_iterate_phdr, dl_phdr_info, PT_LOAD};
 
 #[repr(C)]
 struct CallbackData {
@@ -15,6 +15,11 @@ pub struct Scanner {
 	module_name: String,
 }
 
+#[cfg(target_pointer_width = "32")]
+type Phdr = libc::Elf32_Phdr;
+#[cfg(target_pointer_width = "64")]
+type Phdr = libc::Elf64_Phdr;
+
 extern "C" fn dl_phdr_callback(info: *mut dl_phdr_info, _size: usize, data: *mut c_void) -> c_int {
 	let info = unsafe { *info };
 	let module_name = unsafe { CStr::from_ptr(info.dlpi_name) }.to_str().unwrap();
@@ -26,7 +31,7 @@ extern "C" fn dl_phdr_callback(info: *mut dl_phdr_info, _size: usize, data: *mut
 		return 0;
 	}
 
-	let headers: &'static [Elf32_Phdr] =
+	let headers: &'static [Phdr] =
 		unsafe { std::slice::from_raw_parts(info.dlpi_phdr, info.dlpi_phnum as usize) };
 	let elf_header = headers
 		.iter()
@@ -34,7 +39,7 @@ extern "C" fn dl_phdr_callback(info: *mut dl_phdr_info, _size: usize, data: *mut
 		.next()
 		.unwrap();
 
-	let start = (info.dlpi_addr + elf_header.p_vaddr) as usize;
+	let start = info.dlpi_addr as usize + elf_header.p_vaddr as usize;
 	let end = start + elf_header.p_memsz as usize;
 	let len = end - start;
 
