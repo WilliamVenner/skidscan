@@ -1,3 +1,7 @@
+use scanner::Scanner;
+
+mod scanner;
+
 pub type SignatureRange = (usize, usize);
 pub type SignatureByte = Option<u8>;
 
@@ -46,7 +50,7 @@ impl Signature {
 		Some((start, i))
 	}
 
-	/// Increments the pointer until the signature is found, or until the signature doesn't match.
+	/// Increments the pointer until the signature is found/until the signature doesn't match
 	pub unsafe fn scan_ptr(&self, mut ptr: *const u8) -> Option<*const u8> {
 		let mut i = 0;
 		while i < self.len() {
@@ -64,10 +68,21 @@ impl Signature {
 		}
 		Some(ptr)
 	}
+
+	/// Scan a loaded module for a signature
+	pub unsafe fn scan_module<S: AsRef<str>>(&self, module: S) -> Result<*mut u8, ModuleSigScanError> {
+		let scanner = Scanner::for_module(module.as_ref()).ok_or(ModuleSigScanError::InvalidModule)?;
+		scanner.find(&*self).ok_or(ModuleSigScanError::NotFound)
+	}
 }
 impl From<Vec<Option<u8>>> for Signature {
 	fn from(bytes: Vec<Option<u8>>) -> Self {
 		Self(bytes)
+	}
+}
+impl From<&[Option<u8>]> for Signature {
+	fn from(bytes: &[Option<u8>]) -> Self {
+		Self(bytes.to_vec())
 	}
 }
 impl std::ops::Deref for Signature {
@@ -111,27 +126,23 @@ impl std::str::FromStr for Signature {
 	type Err = SignatureParseError;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		const SPACE: &'static char = &' ';
-
 		let mut added_byte = false;
 
 		let mut signature = Signature::with_capacity(f32::ceil(s.len() as f32 / 2.) as usize);
 
-		let mut iter = s.trim().chars().filter(|char| char != SPACE).into_iter().peekable();
-		while let Some(char) = iter.next() {
-			if char == '?' {
-				if iter.peek() == Some(&'?') {
-					iter.next();
-				}
-				signature.push_any();
-			} else {
-				added_byte = true;
+		let trimmed = s.trim();
+		if trimmed.is_empty() {
+			return Err(SignatureParseError::Empty);
+		}
 
-				let mut byte = String::with_capacity(2);
-				byte.push(char);
-				byte.push(iter.next().ok_or(SignatureParseError::InvalidByte)?);
-
-				signature.push_byte(u8::from_str_radix(&byte, 16).map_err(|_| SignatureParseError::InvalidByte)?);
+		for byte in trimmed.split(' ').into_iter() {
+			match (byte.len(), byte) {
+				(1, "?") | (2, "??") => signature.push_any(),
+				(2, _) => {
+					added_byte = true;
+					signature.push_byte(u8::from_str_radix(&byte, 16).map_err(|_| SignatureParseError::InvalidByte)?);
+				},
+				_ => return Err(SignatureParseError::InvalidByte)
 			}
 		}
 
@@ -144,4 +155,13 @@ impl std::str::FromStr for Signature {
 			Ok(signature)
 		}
 	}
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ModuleSigScanError {
+	/// Failed to find the signature
+	NotFound,
+
+	/// Unable to open the specified module
+	InvalidModule,
 }

@@ -89,6 +89,16 @@ fn test_ida_proc_macro_signature() {
 }
 
 #[test]
+fn test_sized() {
+	unsafe {
+		let bytes: [u8; 5] = [0xEE, 0x69, 0x42, 0xAA, 0xC5];
+		assert!(Signature::from_str("EE ? ?? ? C5").unwrap().scan_ptr(&bytes as *const u8).is_some());
+		assert!(Signature::from_str("EE ? ? ? C5").unwrap().scan_ptr(&bytes as *const u8).is_some());
+		assert!(Signature::from_str("EE ?? ?? ?? C5").unwrap().scan_ptr(&bytes as *const u8).is_some());
+	}
+}
+
+#[test]
 #[cfg(feature = "obfuscate")]
 fn test_obfstr_proc_macro() {
 	mod sigscan { pub use crate::obfstr; }
