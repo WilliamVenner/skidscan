@@ -15,7 +15,7 @@ fn signature_internal(tokens: TokenStream, _obfuscate: bool) -> TokenStream {
 	let mut added_byte = false;
 	let mut first = true;
 
-	let mut signature = "Signature::from(vec![".to_string();
+	let mut signature = "::sigscan::Signature::from(vec![".to_string();
 	for byte in trimmed.split(' ').into_iter() {
 		match (byte.len(), byte) {
 			(1, "?") | (2, "??") => if first {
