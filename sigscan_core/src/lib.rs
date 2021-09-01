@@ -72,7 +72,7 @@ impl Signature {
 	/// Scan a loaded module for a signature
 	pub unsafe fn scan_module<S: AsRef<str>>(&self, module: S) -> Result<*mut u8, ModuleSigScanError> {
 		let scanner = Scanner::for_module(module.as_ref()).ok_or(ModuleSigScanError::InvalidModule)?;
-		scanner.find(&*self).ok_or(ModuleSigScanError::NotFound)
+		scanner.find(&*self)
 	}
 }
 impl From<Vec<Option<u8>>> for Signature {
@@ -161,6 +161,9 @@ impl std::str::FromStr for Signature {
 pub enum ModuleSigScanError {
 	/// Failed to find the signature
 	NotFound,
+
+	/// Found multiple occurrences of the signature
+	MultipleFound,
 
 	/// Unable to open the specified module
 	InvalidModule,

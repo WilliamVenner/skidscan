@@ -1,3 +1,5 @@
+use crate::ModuleSigScanError;
+
 use std::mem;
 use std::ptr;
 
@@ -52,7 +54,7 @@ impl Scanner {
 		})
 	}
 
-	pub fn find(&self, signature: &[Option<u8>]) -> Option<*mut u8> {
+	pub fn find(&self, signature: &[Option<u8>]) -> Result<*mut u8, ModuleSigScanError> {
 		let mut data_current = self.data_begin;
 		let data_end = self.data_end;
 		let mut signature_offset = 0;
@@ -66,7 +68,7 @@ impl Scanner {
 					if signature.len() <= signature_offset + 1 {
 						if result.is_some() {
 							// Found two matches.
-							return None;
+							return Err(ModuleSigScanError::MultipleFound);
 						}
 						result = Some(data_current.offset(-(signature_offset as isize)));
 						data_current = data_current.offset(-(signature_offset as isize));
@@ -83,7 +85,7 @@ impl Scanner {
 			}
 		}
 
-		result
+		result.ok_or_else(|| ModuleSigScanError::NotFound)
 	}
 }
 
