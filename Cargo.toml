@@ -1,6 +1,5 @@
 [workspace]
 members = [
-	"skidscan-core",
 	"skidscan",
     "skidscan-macros"
 ]

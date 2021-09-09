@@ -6,11 +6,17 @@ edition = "2018"
 license = "MIT"
 description = "Quick & dirty Rust sigscanning crate"
 repository = "https://github.com/WilliamVenner/skidscan"
-
-[dependencies]
-skidscan-core = { path = "../skidscan-core" }
-skidscan-macros = { path = "../skidscan-macros" }
-obfstr = { version = "0.3", optional = true }
+keywords = ["sigscan", "hacking", "reverse-engineering", "sigscanning", "game-hacking"]
 
 [features]
 obfuscate = ["skidscan-macros/obfuscate", "obfstr"]
+
+[dependencies]
+skidscan-macros = { version = "0.1.0", path = "../skidscan-macros" }
+obfstr = { version = "0.3", optional = true }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+winapi = { version = "0.3.9", features = ["libloaderapi", "processthreadsapi", "psapi", "minwindef"] }
+
+[target.'cfg(target_os = "unix")'.dependencies]
+libc = "0.2"

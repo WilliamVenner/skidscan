@@ -1,12 +1,12 @@
-mod scanner;
-use scanner::Scanner;
+use crate::{ModuleSigScanError, SigscanPtr, modulescan::Scanner};
 
-pub type SigByte = Option<u8>;
+type SigByte = Option<u8>;
 
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Signature(Vec<SigByte>);
 impl Signature {
 	/// Creates a signature with a specified capacity of bytes
+	#[inline]
 	pub fn with_capacity(capacity: usize) -> Self {
 		Signature(Vec::with_capacity(capacity))
 	}
@@ -82,6 +82,16 @@ impl From<&[Option<u8>]> for Signature {
 		Self(bytes.to_vec())
 	}
 }
+impl From<Vec<u8>> for Signature {
+	fn from(bytes: Vec<u8>) -> Self {
+		Self(bytes.into_iter().map(|byte| Some(byte)).collect())
+	}
+}
+impl From<&[u8]> for Signature {
+	fn from(bytes: &[u8]) -> Self {
+		Self(bytes.iter().map(|byte| Some(*byte)).collect())
+	}
+}
 impl std::ops::Deref for Signature {
 	type Target = Vec<SigByte>;
 
@@ -151,42 +161,5 @@ impl std::str::FromStr for Signature {
 			signature.shrink_to_fit();
 			Ok(signature)
 		}
-	}
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ModuleSigScanError {
-	/// Failed to find the signature
-	NotFound,
-
-	/// Found multiple occurrences of the signature
-	MultipleFound,
-
-	/// Unable to open the specified module
-	InvalidModule,
-}
-
-pub trait SigscanPtr: Copy {
-	unsafe fn next(self) -> Self;
-	unsafe fn byte(self) -> u8;
-}
-impl SigscanPtr for *const u8 {
-	#[inline]
-	unsafe fn next(self) -> Self {
-		self.add(1)
-	}
-	#[inline]
-	unsafe fn byte(self) -> u8 {
-		*self
-	}
-}
-impl SigscanPtr for *mut u8 {
-	#[inline]
-	unsafe fn next(self) -> Self {
-		self.add(1)
-	}
-	#[inline]
-	unsafe fn byte(self) -> u8 {
-		*self
 	}
 }

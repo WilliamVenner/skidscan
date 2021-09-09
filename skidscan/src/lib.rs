@@ -1,8 +1,38 @@
-pub use skidscan_core::*;
 pub use skidscan_macros::*;
 
 #[cfg(feature = "obfuscate")]
 pub use obfstr::obfstr;
+
+mod signatures;
+pub use signatures::*;
+
+mod modulescan;
+pub use modulescan::ModuleSigScanError;
+
+pub trait SigscanPtr: Copy {
+	unsafe fn next(self) -> Self;
+	unsafe fn byte(self) -> u8;
+}
+impl SigscanPtr for *const u8 {
+	#[inline]
+	unsafe fn next(self) -> Self {
+		self.add(1)
+	}
+	#[inline]
+	unsafe fn byte(self) -> u8 {
+		*self
+	}
+}
+impl SigscanPtr for *mut u8 {
+	#[inline]
+	unsafe fn next(self) -> Self {
+		self.add(1)
+	}
+	#[inline]
+	unsafe fn byte(self) -> u8 {
+		*self
+	}
+}
 
 trait SigScan {
 	/// Scans this slice of bytes for a given signature

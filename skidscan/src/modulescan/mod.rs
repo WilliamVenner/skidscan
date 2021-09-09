@@ -30,3 +30,15 @@ pub use linux::Scanner;
 mod windows;
 #[cfg(target_os = "windows")]
 pub use windows::Scanner;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ModuleSigScanError {
+	/// Failed to find the signature
+	NotFound,
+
+	/// Found multiple occurrences of the signature
+	MultipleFound,
+
+	/// Unable to open the specified module
+	InvalidModule,
+}

@@ -3,7 +3,9 @@ name = "skidscan-macros"
 version = "0.1.0"
 authors = ["William Venner <william@venner.io>"]
 edition = "2018"
-publish = false
+license = "MIT"
+description = "Proc macros for skidscan"
+repository = "https://github.com/WilliamVenner/skidscan"
 
 [lib]
 proc-macro = true
