@@ -1,6 +1,6 @@
 [package]
 name = "skidscan"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["William Venner <william@venner.io>"]
 edition = "2018"
 license = "MIT"
@@ -12,7 +12,7 @@ keywords = ["sigscan", "hacking", "reverse-engineering", "sigscanning", "game-ha
 obfuscate = ["skidscan-macros/obfuscate", "obfstr"]
 
 [dependencies]
-skidscan-macros = { version = "0.1.0", path = "../skidscan-macros" }
+skidscan-macros = { version = "0.1.1", path = "../skidscan-macros" }
 obfstr = { version = "0.3", optional = true }
 
 [target.'cfg(target_os = "windows")'.dependencies]

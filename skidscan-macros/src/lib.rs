@@ -30,7 +30,6 @@ fn signature_internal(tokens: TokenStream, _obfuscate: bool) -> TokenStream {
 				if _obfuscate {
 					let byte = u8::from_str_radix(&byte, 16).expect("Invalid byte in signature");
 					signature.push_str("Some(::skidscan::obfstr!(\"");
-
 					signature.push_str(&byte.to_string());
 					signature.push_str("\").parse::<u8>().unwrap()),");
 					continue;
