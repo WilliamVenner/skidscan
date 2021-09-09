@@ -1,12 +1,10 @@
+mod scanner;
 use scanner::Scanner;
 
-mod scanner;
-
-pub type SignatureRange = (usize, usize);
-pub type SignatureByte = Option<u8>;
+pub type SigByte = Option<u8>;
 
 #[derive(Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Signature(Vec<SignatureByte>);
+pub struct Signature(Vec<SigByte>);
 impl Signature {
 	/// Creates a signature with a specified capacity of bytes
 	pub fn with_capacity(capacity: usize) -> Self {
@@ -26,14 +24,13 @@ impl Signature {
 	}
 
 	/// Scans a slice of bytes for the signature
-	pub fn scan(&self, bytes: &[u8]) -> Option<SignatureRange> {
+	pub fn scan(&self, bytes: &[u8]) -> Option<usize> {
 		let mut iter_bytes = bytes.iter().enumerate();
 		let mut start = 0;
 		let mut i = 0;
 		while i < self.len() {
 			let (byte_pos, byte) = iter_bytes.next()?;
-			let sig_byte = &self.0[i];
-			if let Some(sig_byte) = sig_byte {
+			if let Some(sig_byte) = &self.0[i] {
 				if sig_byte == byte {
 					i += 1;
 					if start == 0 {
@@ -47,7 +44,7 @@ impl Signature {
 				i += 1;
 			}
 		}
-		Some((start, i))
+		Some(start)
 	}
 
 	/// Increments the pointer until the signature is found/until the signature doesn't match
@@ -86,7 +83,7 @@ impl From<&[Option<u8>]> for Signature {
 	}
 }
 impl std::ops::Deref for Signature {
-	type Target = Vec<SignatureByte>;
+	type Target = Vec<SigByte>;
 
 	fn deref(&self) -> &Self::Target {
 		&self.0
