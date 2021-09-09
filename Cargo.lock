@@ -31,27 +31,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "signature-macro"
-version = "0.1.0"
-dependencies = [
- "syn",
-]
-
-[[package]]
-name = "sigscan"
+name = "skidscan"
 version = "0.1.0"
 dependencies = [
  "obfstr",
- "signature-macro",
- "sigscan-core",
+ "skidscan-core",
+ "skidscan-macros",
 ]
 
 [[package]]
-name = "sigscan-core"
+name = "skidscan-core"
 version = "0.1.0"
 dependencies = [
  "libc",
  "winapi",
+]
+
+[[package]]
+name = "skidscan-macros"
+version = "0.1.0"
+dependencies = [
+ "syn",
 ]
 
 [[package]]

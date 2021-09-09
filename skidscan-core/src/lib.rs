@@ -51,10 +51,10 @@ impl Signature {
 	}
 
 	/// Increments the pointer until the signature is found/until the signature doesn't match
-	pub unsafe fn scan_ptr(&self, mut ptr: *const u8) -> Option<*const u8> {
+	pub unsafe fn scan_ptr<P: SigscanPtr>(&self, mut ptr: P) -> Option<P> {
 		let mut i = 0;
 		while i < self.len() {
-			let byte = *ptr;
+			let byte = ptr.byte();
 			let sig_byte = &self.0[i];
 			if let Some(sig_byte) = sig_byte {
 				if *sig_byte != byte {
@@ -64,7 +64,7 @@ impl Signature {
 				}
 			}
 			i += 1;
-			ptr = ptr.add(1);
+			ptr = ptr.next();
 		}
 		Some(ptr)
 	}
@@ -167,4 +167,29 @@ pub enum ModuleSigScanError {
 
 	/// Unable to open the specified module
 	InvalidModule,
+}
+
+pub trait SigscanPtr: Copy {
+	unsafe fn next(self) -> Self;
+	unsafe fn byte(self) -> u8;
+}
+impl SigscanPtr for *const u8 {
+	#[inline]
+	unsafe fn next(self) -> Self {
+		self.add(1)
+	}
+	#[inline]
+	unsafe fn byte(self) -> u8 {
+		*self
+	}
+}
+impl SigscanPtr for *mut u8 {
+	#[inline]
+	unsafe fn next(self) -> Self {
+		self.add(1)
+	}
+	#[inline]
+	unsafe fn byte(self) -> u8 {
+		*self
+	}
 }

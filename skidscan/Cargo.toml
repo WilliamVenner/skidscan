@@ -1,0 +1,16 @@
+[package]
+name = "skidscan"
+version = "0.1.0"
+authors = ["William Venner <william@venner.io>"]
+edition = "2018"
+license = "MIT"
+description = "Quick & dirty Rust sigscanning crate"
+repository = "https://github.com/WilliamVenner/skidscan"
+
+[dependencies]
+skidscan-core = { path = "../skidscan-core" }
+skidscan-macros = { path = "../skidscan-macros" }
+obfstr = { version = "0.3", optional = true }
+
+[features]
+obfuscate = ["skidscan-macros/obfuscate", "obfstr"]

@@ -1,6 +1,6 @@
 [workspace]
 members = [
-	"sigscan_core",
-	"sigscan",
-    "signature_macro"
+	"skidscan-core",
+	"skidscan",
+    "skidscan-macros"
 ]

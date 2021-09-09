@@ -1,5 +1,5 @@
 [package]
-name = "sigscan-core"
+name = "skidscan-core"
 version = "0.1.0"
 authors = ["William Venner <william@venner.io>"]
 edition = "2018"
