@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate syn;
 
+use proc_macro_crate::*;
 use proc_macro::TokenStream;
 use syn::LitStr;
 
@@ -12,10 +13,19 @@ fn signature_internal(tokens: TokenStream, _obfuscate: bool) -> TokenStream {
 		panic!("Empty signature");
 	}
 
+	let crate_name = match crate_name("skidscan") {
+		Ok(FoundCrate::Itself) => "".to_string(),
+		Ok(FoundCrate::Name(name)) => format!("{}::", name),
+		Err(_) => match crate_name("gmod").expect("Couldn't find skidscan in Cargo.toml - proc macro failed") {
+			FoundCrate::Itself => "sigscan::".to_string(),
+			FoundCrate::Name(name) => format!("{}::sigscan::", name),
+		}
+	};
+
 	let mut added_byte = false;
 	let mut first = true;
 
-	let mut signature = "::skidscan::Signature::from(vec![".to_string();
+	let mut signature = format!("{}Signature::from(vec![", crate_name);
 	for byte in trimmed.split(' ').into_iter() {
 		match (byte.len(), byte) {
 			(1, "?") | (2, "??") => if first {
@@ -29,7 +39,7 @@ fn signature_internal(tokens: TokenStream, _obfuscate: bool) -> TokenStream {
 				#[cfg(feature = "obfuscate")]
 				if _obfuscate {
 					let byte = u8::from_str_radix(&byte, 16).expect("Invalid byte in signature");
-					signature.push_str("Some(::skidscan::obfstr!(\"");
+					signature.push_str(&format!("Some({}obfstr!(\"", crate_name));
 					signature.push_str(&byte.to_string());
 					signature.push_str("\").parse::<u8>().unwrap()),");
 					continue;

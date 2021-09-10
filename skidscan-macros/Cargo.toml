@@ -1,6 +1,6 @@
 [package]
 name = "skidscan-macros"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["William Venner <william@venner.io>"]
 edition = "2018"
 license = "MIT"
@@ -12,6 +12,7 @@ proc-macro = true
 
 [dependencies]
 syn = "1.0"
+proc-macro-crate = "1"
 
 [features]
 obfuscate = []
