@@ -104,6 +104,32 @@ fn test_ptr_scan_sub() {
 }
 
 #[test]
+fn test_ptr_scan_sub_rewind() {
+	unsafe {
+		let bytes: [u8; 32] = [
+			0x55, 0x8B, 0xEC, 0x83, 0xE4, 0xF8, 0x83, 0xEC, 0x78, 0x8B, 0x45, 0x0C, 0xB9, 0x88,
+			0xA1, 0x06, 0x10, 0x89, 0x04, 0x24, 0x8B, 0x45, 0x10, 0x89, 0x44, 0x24, 0x04, 0x8D,
+			0x04, 0x24, 0x56, 0xFF,
+		];
+
+		let sig = Signature::from_str("24 8B 45 ?? ?? 44 24").unwrap();
+		let ptr = sig
+		.scan_ptr(bytes.as_ptr(), bytes.as_ptr().add(bytes.len()))
+		.unwrap();
+
+		assert_eq!(
+			*ptr,
+			0x24
+		);
+
+		assert_eq!(
+			ptr,
+			bytes.as_ptr().add(19)
+		);
+	}
+}
+
+#[test]
 fn test_ptr_scan_sub_fail() {
 	unsafe {
 		let bytes: [u8; 32] = [

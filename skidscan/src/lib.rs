@@ -12,6 +12,7 @@ pub use modulescan::ModuleSigScanError;
 pub trait SigscanPtr: Copy + Ord {
 	unsafe fn next(self) -> Self;
 	unsafe fn byte(self) -> u8;
+	unsafe fn rewind(self, bytes: usize) -> Self;
 }
 impl SigscanPtr for *const u8 {
 	#[inline]
@@ -22,6 +23,10 @@ impl SigscanPtr for *const u8 {
 	unsafe fn byte(self) -> u8 {
 		*self
 	}
+	#[inline]
+	unsafe fn rewind(self, bytes: usize) -> Self {
+		self.sub(bytes)
+	}
 }
 impl SigscanPtr for *mut u8 {
 	#[inline]
@@ -31,6 +36,10 @@ impl SigscanPtr for *mut u8 {
 	#[inline]
 	unsafe fn byte(self) -> u8 {
 		*self
+	}
+	#[inline]
+	unsafe fn rewind(self, bytes: usize) -> Self {
+		self.sub(bytes)
 	}
 }
 

@@ -48,6 +48,8 @@ impl Signature {
 	}
 
 	/// Increments the pointer until the signature is found
+	///
+	/// The returned pointer will be the first byte of the signature
 	pub unsafe fn scan_ptr<P: SigscanPtr>(&self, mut ptr: P, max: P) -> Option<P> {
 		let mut i = 0;
 		while ptr < max {
@@ -62,7 +64,7 @@ impl Signature {
 			}
 			i += 1;
 			if i >= self.len() {
-				return Some(ptr);
+				return Some(ptr.rewind(self.len() - 1));
 			}
 			ptr = ptr.next();
 		}
