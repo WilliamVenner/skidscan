@@ -47,23 +47,26 @@ impl Signature {
 		Some(start)
 	}
 
-	/// Increments the pointer until the signature is found/until the signature doesn't match
-	pub unsafe fn scan_ptr<P: SigscanPtr>(&self, mut ptr: P) -> Option<P> {
+	/// Increments the pointer until the signature is found
+	pub unsafe fn scan_ptr<P: SigscanPtr>(&self, mut ptr: P, max: P) -> Option<P> {
 		let mut i = 0;
-		while i < self.len() {
+		while ptr < max {
 			let byte = ptr.byte();
 			let sig_byte = &self.0[i];
 			if let Some(sig_byte) = sig_byte {
 				if *sig_byte != byte {
-					#[cfg(debug_assertions)]
-					eprintln!("DEBUG: Sigscan found mismatched bytes: 0x{:02X} (sig) != 0x{:02X} (mem) at offset {}", sig_byte, byte, i);
-					return None;
+					i = 0;
+					ptr = ptr.next();
+					continue;
 				}
 			}
 			i += 1;
+			if i >= self.len() {
+				return Some(ptr);
+			}
 			ptr = ptr.next();
 		}
-		Some(ptr)
+		None
 	}
 
 	/// Scan a loaded module for a signature

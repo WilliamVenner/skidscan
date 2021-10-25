@@ -9,7 +9,7 @@ pub use signatures::*;
 mod modulescan;
 pub use modulescan::ModuleSigScanError;
 
-pub trait SigscanPtr: Copy {
+pub trait SigscanPtr: Copy + Ord {
 	unsafe fn next(self) -> Self;
 	unsafe fn byte(self) -> u8;
 }
