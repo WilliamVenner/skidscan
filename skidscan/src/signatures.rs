@@ -100,11 +100,13 @@ impl From<&[u8]> for Signature {
 impl std::ops::Deref for Signature {
 	type Target = Vec<SigByte>;
 
+	#[inline(always)]
 	fn deref(&self) -> &Self::Target {
 		&self.0
 	}
 }
 impl std::ops::DerefMut for Signature {
+	#[inline(always)]
 	fn deref_mut(&mut self) -> &mut Self::Target {
 		&mut self.0
 	}

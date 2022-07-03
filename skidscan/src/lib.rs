@@ -17,29 +17,29 @@ pub trait SigscanPtr: Copy + Ord {
 	unsafe fn rewind(self, bytes: usize) -> Self;
 }
 impl SigscanPtr for *const u8 {
-	#[inline]
+	#[inline(always)]
 	unsafe fn next(self) -> Self {
 		self.add(1)
 	}
-	#[inline]
+	#[inline(always)]
 	unsafe fn byte(self) -> u8 {
 		*self
 	}
-	#[inline]
+	#[inline(always)]
 	unsafe fn rewind(self, bytes: usize) -> Self {
 		self.sub(bytes)
 	}
 }
 impl SigscanPtr for *mut u8 {
-	#[inline]
+	#[inline(always)]
 	unsafe fn next(self) -> Self {
 		self.add(1)
 	}
-	#[inline]
+	#[inline(always)]
 	unsafe fn byte(self) -> u8 {
 		*self
 	}
-	#[inline]
+	#[inline(always)]
 	unsafe fn rewind(self, bytes: usize) -> Self {
 		self.sub(bytes)
 	}
@@ -52,6 +52,7 @@ trait SigScan {
 	fn sigscan(&self, signature: &Signature) -> Option<usize>;
 }
 impl<B: AsRef<[u8]>> SigScan for B {
+	#[inline(always)]
 	fn sigscan(&self, signature: &Signature) -> Option<usize> {
 		signature.scan(self.as_ref())
 	}
