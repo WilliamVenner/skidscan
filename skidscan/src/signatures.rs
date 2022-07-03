@@ -89,7 +89,7 @@ impl From<&[Option<u8>]> for Signature {
 }
 impl From<Vec<u8>> for Signature {
 	fn from(bytes: Vec<u8>) -> Self {
-		Self(bytes.into_iter().map(|byte| Some(byte)).collect())
+		Self(bytes.into_iter().map(Some).collect())
 	}
 }
 impl From<&[u8]> for Signature {
@@ -147,12 +147,12 @@ impl std::str::FromStr for Signature {
 			return Err(SignatureParseError::Empty);
 		}
 
-		for byte in trimmed.split(' ').into_iter() {
+		for byte in trimmed.split(' ') {
 			match (byte.len(), byte) {
 				(1, "?") | (2, "??") => signature.push_any(),
 				(2, _) => {
 					added_byte = true;
-					signature.push_byte(u8::from_str_radix(&byte, 16).map_err(|_| SignatureParseError::InvalidByte)?);
+					signature.push_byte(u8::from_str_radix(byte, 16).map_err(|_| SignatureParseError::InvalidByte)?);
 				},
 				_ => return Err(SignatureParseError::InvalidByte)
 			}

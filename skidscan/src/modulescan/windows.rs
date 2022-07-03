@@ -85,7 +85,7 @@ impl Scanner {
 			}
 		}
 
-		result.ok_or_else(|| ModuleSigScanError::NotFound)
+		result.ok_or(ModuleSigScanError::NotFound)
 	}
 }
 

@@ -50,7 +50,7 @@ checksum = "f12d06de37cf59146fbdecab66aa99f9fe4f78722e3607577a5375d66bd0c913"
 
 [[package]]
 name = "skidscan"
-version = "2.0.0"
+version = "2.0.1"
 dependencies = [
  "libc",
  "obfstr",

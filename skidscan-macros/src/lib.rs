@@ -26,7 +26,7 @@ fn signature_internal(tokens: TokenStream, _obfuscate: bool) -> TokenStream {
 	let mut first = true;
 
 	let mut signature = format!("{}Signature::from(vec![", crate_name);
-	for byte in trimmed.split(' ').into_iter() {
+	for byte in trimmed.split(' ') {
 		match (byte.len(), byte) {
 			(1, "?") | (2, "??") => if first {
 				signature.push_str("None::<u8>,");

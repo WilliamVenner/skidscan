@@ -1,3 +1,5 @@
+#![allow(clippy::missing_safety_doc)]
+
 pub use skidscan_macros::*;
 
 #[cfg(feature = "obfuscate")]
